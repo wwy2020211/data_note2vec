@@ -1,0 +1,33 @@
+from py2neo import Graph
+import json
+import re
+from py2neo import Graph
+import json
+import re
+from collections import Counter
+
+def analy_abs(listabs,listtitle):
+    lisabs=sum(listabs,[])
+    listit=[word for line in listtitle for word in line.split()]
+    abs_count=Counter(lisabs)
+    title_count = Counter(listit)
+    top_four=title_count.most_common(4)
+    top_ten = abs_count.most_common(10)
+    return top_four,top_ten
+def draw_know(graph):
+    nodes_datas = graph.run("MATCH (b:B)--(n:`标题`) RETURN n").data()
+    title_list=[]
+    for node in nodes_datas:
+        title_list.append(node['n']['name'])            #知识抽取
+    abs_list=[]    
+    print("done")
+    for node in nodes_datas:
+        abs_list.append(node['n']['abstract'])            #知识抽取
+    print("done")
+    topic,key_feature=analy_abs(abs_list,title_list)
+    print("B类主题是  ")
+    print(topic)
+    print("关键词")
+    print(key_feature)
+graph = Graph("bolt://localhost:7687/", auth=("neo4j", "123456"))
+draw_know(graph)
