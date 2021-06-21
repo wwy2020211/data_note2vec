@@ -1,0 +1,73 @@
+from keras.layers import Dense, Flatten, Input
+from keras.layers.embeddings import Embedding
+from keras.models import Model
+from keras.preprocessing.sequence import pad_sequences
+from keras.preprocessing.text import one_hot
+import pandas as pd
+import numpy as np
+# define documents
+docs = imp
+# define class labels
+#labels = [1, 1, 1, 1, 1, 0, 0, 0, 0, 0]
+# integer encode the documents
+vocab_size = 500
+vector_list=[]
+for doc in docs:
+    encoded_docs = [one_hot(d, vocab_size) for d in doc]   #one_hot编码到[1,n],不包括0
+    vector_list.append(encoded_docs)
+v_m=[]
+for v in vector_list:
+    sum=0
+    for t in v:
+        for j in t:
+            sum=sum+int(j)
+            #print(sum)
+        v_m.append(sum/len(v))
+print(v_m)
+vv=pd.DataFrame(v_m)
+
+#K-MEANS初步分类
+from sklearn.cluster import KMeans
+kmeans = KMeans(n_clusters=3, random_state=10).fit(vv)
+labels=kmeans.labels_
+
+#创建属性字典
+
+dicts=[]
+for i in range(len(dfl)):
+    try:
+        tw_dict = {'abstract':imp[i],
+               'name':dfl['title'][i],
+               'url':dfl['url'][i],
+               'publish_time':dfl['publish_time'][i],
+               'category':str(labels[i])
+              }
+    except KeyError:
+        tw_dict = {'abstract':imp[i],
+               'name':'0',
+               'url':'0',
+               'publish_time':'0',
+               'category':str(labels[i])}
+    dicts.append(tw_dict)
+#创建图谱&关系    
+graph.delete_all()
+dtn4.create_node(dicts,node_list_authors,dfl)
+
+#查询
+from py2neo import Graph, Node, Relationship,NodeMatcher 
+ 
+#连接图数据库
+#graph = Graph('http://localhost:7474', username='neo4j', password='neo4j')
+ 
+#创建一个nodematcher，节点查询器
+nodematcher= NodeMatcher(graph)
+ 
+#按标签查询
+match=nodematcher.match("Person")
+ 
+#打印输出
+for node in match:
+    print(node)
+
+print(list(match))
+
