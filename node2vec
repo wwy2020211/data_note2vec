@@ -1,0 +1,59 @@
+import networkx as nx
+import csv
+import pandas as pd
+df = pd.read_csv('metadata.csv')
+Graphtype = nx.Graph()
+G = nx.from_pandas_edgelist(df,'title', 'abstract',create_using=Graphtype)
+
+from node2vec import Node2Vec
+# Generate walks
+node2vec = Node2Vec(G, dimensions=20, walk_length=16, num_walks=100)
+# Reformat position nodes
+fix_formatted_positions = lambda x: x.split('_')[0] if x in formatted_positions else x
+reformatted_walks = [list(map(fix_formatted_positions, walk)) for walk in node2vec.walks]
+node2vec.walks = reformatted_walks
+# Learn embeddings
+model = node2vec.fit(window=10, min_count=1)
+
+types=[]
+count=0
+for node, _ in model.most_similar('disease feature'):  #特征类
+    types.append(node['n']['category'])
+    if len(node) > 3:
+        count=count+1
+var0=np.var(np.array(types))
+types=[]
+for node, _ in model.most_similar('Disease spread '):  #传播类
+    types.append(node['n']['category'])
+    if len(node) > 3:
+        count=count+1
+var1=np.var(np.array(types))
+types=[]
+for node, _ in model.most_similar('future risk'):    #未来风险研究类
+    types.append(node['n']['category'])
+    if len(node) > 3:
+        count=count+1
+var2=np.var(np.array(types))
+print("模型散度(特征类)")
+print(var0)
+print("模型散度(传播类)")
+print(var1)
+print("模型散度(未来风险研究类)")
+print(var2)
+print("不相似率")
+print(count/len(df))
+
+import networkx as nx
+import csv
+import pandas as pd
+df = pd.read_csv('metadata.csv')
+Graphtype = nx.Graph()
+G = nx.from_pandas_edgelist(df,'title', 'abstract',create_using=Graphtype)
+
+nx.draw(G,
+        pos = nx.spring_layout(G), 
+        node_color = 'b', 
+        edge_color = 'r', 
+        with_labels = False, 
+        font_size =0.00001, 
+        node_size =0.00001)  # font_size表示字体大小,font_color表示字的颜色
