@@ -1,0 +1,52 @@
+class DataToNeo4j(object):
+    def __init__(self):
+        link=graph
+        self.graphs=link
+        self.title='标题'
+        self.author='作者'
+        self.abs='摘要'
+        self.ad='地址'
+        #self.graph.delete_all()
+    def create_node(self,dict_key,node_list_authors,dfs):  #,node_list_abs,node_list_ads):   #标题节点
+        i=1
+        #大类
+        name_node1=Node('一类','A')
+        name_node2=Node('二类','B')
+        name_node3=Node('三类','C')
+        self.graphs.create(name_node1)
+        self.graphs.create(name_node2)
+        self.graphs.create(name_node3)
+        for dk in dict_key:
+            name_node=Node(self.title,**dk)  #,abstract=dfs['abstract'][i],linking=dfs['url'[i]])
+            self.graphs.create(name_node)
+            try:
+                #for name in node_list_authors:               #作者节点
+                author_node=Node(self.author,name=node_list_authors[i])
+                self.graphs.create(author_node)            
+                rel=Relationship(name_node,'written',author_node)
+                self.graphs.create(rel)
+            except KeyError:
+                #for name in node_list_authors:               #作者节点
+                print('wrong')
+            i=i+1
+            
+            
+            if dk['category']==str(0):
+                rel=Relationship(name_node,'belong to',name_node1)
+                self.graphs.create(rel)
+            if dk['category']==str(1):
+                rel=Relationship(name_node,'belong to',name_node2)
+                self.graphs.create(rel)
+            if dk['category']==str(2):
+                rel=Relationship(name_node,'belong to',name_node3)
+                self.graphs.create(rel)
+            
+from py2neo import Node, Graph, Relationship,NodeMatcher,data,Database
+import py2neo
+#py2neo.authenticate("localhost:7474", "neo4j", "123456")
+graph = Graph("bolt://localhost:7687/", auth=("neo4j", "123456"))
+
+node_list_key=dfl['title']
+node_list_authors=dfl['authors']
+print(len(node_list_key))
+dtn4=DataToNeo4j()
